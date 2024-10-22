@@ -2,12 +2,14 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
+const Post = require('./models/Post');
 const User = require('./models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const uploadMiddleware = multer({dest:'uploads/'});
+const fs = require('fs');
 
 const salt = bcrypt.genSaltSync(10);
 const secret = 'sdfsheuif324324sheofhsoehfsfe';
@@ -65,8 +67,34 @@ app.post('/logout', (req, res) => {
     res.cookie('token', '').json('logged out');
 });
 
-app.post('/post', uploadMiddleware.single('file'), (req, res) => {
-    res.json({files:req.file});
+app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
+    const {originalname, path} = req.file;
+    const parts = originalname.split('.');
+    const ext = parts[parts.length-1];
+    const newPath = path + '.' + ext;
+    fs.renameSync(path, newPath);
+
+    const {token} = req.cookies;
+    // get the user id from the token
+    jwt.verify(token, secret, {}, async (err, info) => {
+        if (err) throw err;
+        // create a new post
+        const {title, summary, content} = req.body;
+        const postDoc = await Post.create({
+            title, summary, content, cover:newPath, author:info.id
+        });
+        res.json(postDoc);
+    });
+
+
+
+});
+
+app.get('/post', async (req, res) => {
+    // For some reason, the author information is not being populated.
+    // Remember to check this
+    const posts = await Post.find().populate('author');
+    res.json(posts);
 });
 
 app.listen(4000);
