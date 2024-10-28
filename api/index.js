@@ -17,6 +17,8 @@ const secret = 'sdfsheuif324324sheofhsoehfsfe';
 app.use(cors({credentials:true, origin:'http://localhost:3000'}));
 app.use(express.json());
 app.use(cookieParser());
+app.use('/uploads', express.static(__dirname + '/uploads'));
+
 
 mongoose.connect('mongodb+srv://blog:pQD9iAEP5vc3U1gI@cluster0.i5s9j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
 
@@ -91,11 +93,19 @@ app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
 });
 
 app.get('/post', async (req, res) => {
-    // For some reason, the author information is not being populated.
-    // Remember to check this
-    const posts = await Post.find().populate('author');
-    res.json(posts);
+
+    res.json(
+        await Post.find()
+        .populate('author', ['username'])
+        .sort({createdAt:-1})
+    );
 });
+
+app.get('/post/:id', async (req, res) => {
+    const { id } = req.params;
+    const postDoc = await Post.findById(id).populate('author', ['username']);
+    res.json(postDoc);
+})
 
 app.listen(4000);
 
