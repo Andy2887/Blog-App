@@ -18,7 +18,7 @@ export default function PostPage() {
     if (!postInfo) return " ";
 
     return (
-        <div>
+        <div className="post-page">
             <div className = "image">
                 <img src={`http://localhost:4000/${postInfo.cover}`} alt=""/> 
             </div>
