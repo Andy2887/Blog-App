@@ -7,6 +7,7 @@ export default function Header(){
                 <h1>Blog</h1>
             </div>
             <nav className="nav-links">
+                <Link to="/">Home</Link>
                 <Link to="/login">Login</Link>
                 <Link to="/register">Register</Link>
             </nav>
