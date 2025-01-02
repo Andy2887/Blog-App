@@ -4,6 +4,7 @@ const app = express();
 const mongoose = require('mongoose');
 require('dotenv').config();
 const User = require('./models/User');
+const Post = require('./models/Post');
 const bycrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const salt = bycrypt.genSaltSync(10);
@@ -55,6 +56,23 @@ app.post('/login', async (req, res) => {
             res.status(400).json("wrong credentials");
         }
 
+    }catch(e){
+        res.status(400).json(e);
+    }
+});
+
+// api endpoint to create new post
+app.post('/create-post', async (req, res) => {
+    // verify the token
+    const token = req.cookies.token;
+    const author = jwt.decode(token).username;
+    const { title, description, content } = req.body;
+    // save the post to the database
+    try{
+        const postDoc = await Post.create({
+            title, description, content, author
+        });
+        res.json(postDoc);
     }catch(e){
         res.status(400).json(e);
     }
