@@ -6,11 +6,6 @@ export default function Post(){
                 <span className="author">By John Doe</span>
                 <span className="date">March 15, 2024</span>
             </div>
-            <img 
-                src="https://via.placeholder.com/800x400" 
-                alt="React Blog Post" 
-                className="post-image"
-            />
             <p className="post-excerpt">
                 React is a powerful library for building user interfaces. 
                 In this post, we'll explore the fundamental concepts and 
